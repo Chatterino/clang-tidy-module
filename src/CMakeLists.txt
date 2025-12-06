@@ -11,3 +11,7 @@ target_include_directories(chatterino-clang-tidy-module PRIVATE
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )
+
+set_target_properties(chatterino-clang-tidy-module PROPERTIES
+    PREFIX "" # Remove the "lib" prefix
+)
