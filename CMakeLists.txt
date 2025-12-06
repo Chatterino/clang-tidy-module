@@ -9,7 +9,13 @@ project(chatterino-clang-tidy-module
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 
+message(STATUS "Using LLVM from ${LLVM_DIR}")
+message(STATUS "Using Clang from ${Clang_DIR}")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(src)
+if (BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
