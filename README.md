@@ -6,7 +6,7 @@ I build and test this like this:
 mkdir build
 cd build
 cmake ..
-make -j20 && clang-tidy --load ./src/libchatterino-clang-tidy-module.so --checks='*,chatterino-*' ../tests/*
+make -j20 && clang-tidy --load ./src/chatterino-clang-tidy-module.so --checks='*,chatterino-*' ../tests/*
 ```
 
 ## Checks
