@@ -1,0 +1,75 @@
+---
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - "release/*"
+  pull_request:
+  workflow_dispatch:
+  merge_group:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build:
+    name: "Ubuntu with clang ${{ matrix.clang-version }}"
+    runs-on: ubuntu-latest
+    container: ubuntu:25.10
+    strategy:
+      matrix:
+        clang-version:
+          - 19
+          - 20
+          - 21
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          apt update
+          apt -y install \
+            cmake \
+            zip \
+            libstdc++-15-dev \
+            clang-${{ matrix.clang-version }} \
+            libclang-${{ matrix.clang-version }}-dev
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake \
+            -DCMAKE_C_COMPILER=/usr/bin/clang-${{matrix.clang-version}} \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++-${{matrix.clang-version}} \
+            ..
+          make -j"$(nproc)"
+
+      - name: Generate tag
+        id: gen-tag
+        run: echo "name=clazy-${{ env.CLAZY_TAG }}-clang${{ matrix.clang-version }}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare artifact
+        run: |
+          cp build/src/libchatterino-clang-tidy-module.so libchatterino-clang-tidy-module-${{ matrix.clang-version }}.so
+          zip -r "${{ steps.gen-tag.outputs.name }}.zip" libchatterino-clang-tidy-module-${{ matrix.clang-version }}.so
+
+      - name: Create release
+        uses: ncipollo/release-action@v1.20.0
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        with:
+          replacesArtifacts: true
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: ${{ steps.gen-tag.outputs.name }}.zip
+          body: ""
+          prerelease: true
+          name: Chatterino clang-tidy-module
+          tag: ci
