@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate tag
         id: gen-tag
-        run: echo "name=clazy-${{ env.CLAZY_TAG }}-clang${{ matrix.clang-version }}" >> "$GITHUB_OUTPUT"
+        run: echo "name=chatterino-clang-tidy-module-clang${{ matrix.clang-version }}" >> "$GITHUB_OUTPUT"
 
       - name: Prepare artifact
         run: |
