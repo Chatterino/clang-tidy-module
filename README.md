@@ -1,5 +1,14 @@
 This repository builds a clang-tidy module with checks specialized for the [Chatterino](https://github.com/Chatterino/chatterino2) project.
 
+I build and test this like this:
+
+```
+mkdir build
+cd build
+cmake ..
+make -j20 && clang-tidy --load ./src/libchatterino-clang-tidy-module.so --checks='*,chatterino-*' ../tests/*
+```
+
 ## Checks
 
 ### chatterino-explicit-this
