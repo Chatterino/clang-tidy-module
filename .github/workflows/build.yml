@@ -40,17 +40,22 @@ jobs:
             zip \
             libstdc++-15-dev \
             clang-${{ matrix.clang-version }} \
-            libclang-${{ matrix.clang-version }}-dev
+            libclang-${{ matrix.clang-version }}-dev \
+            clang-tidy-${{ matrix.clang-version }} \
+            llvm-${{ matrix.clang-version }}-dev \
+            llvm-${{ matrix.clang-version }}-tools
 
-      - name: Build
+      - name: Build and test
         run: |
           mkdir build
           cd build
           cmake \
             -DCMAKE_C_COMPILER=/usr/bin/clang-${{matrix.clang-version}} \
             -DCMAKE_CXX_COMPILER=/usr/bin/clang++-${{matrix.clang-version}} \
+            -DCMAKE_PREFIX_PATH=/usr/lib/llvm-${{matrix.clang-version}} \
+            -DBUILD_TESTING=On \
             ..
-          make -j"$(nproc)"
+          make -j"$(nproc)" check-chatterino-clang-tidy-module
 
       - name: Generate tag
         id: gen-tag
